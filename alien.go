@@ -67,45 +67,45 @@ func (g *Graph) addEdge(from, to string) {
 	g.edgeMap[from] = relations
 }
 
+// Non-recursive DFS
 func (g *Graph) topologicalSort() ([]string, bool) {
-	sortedChar := []string{}
+	sorted := []string{}
 
-	discovered := make(map[string]bool)
-	processed := make(map[string]bool)
 	dfsStack := dfsStack{}
+	color := make(map[string]string)
 
 	for k, _ := range g.edgeMap {
 		dfsStack.push(k)
 
 		for len(dfsStack) != 0 {
 			top := dfsStack.peek()
-			discovered[top] = true
 
-			if _, ok := g.edgeMap[top]; !ok {
-				processed[top] = true
-				discovered[top] = false
-				sortedChar = pushFront(sortedChar, top)
+			if color[top] == "black" {
 				dfsStack = dfsStack.pop()
-			} else if len(g.edgeMap[top]) == 0 {
-				sortedChar = pushFront(sortedChar, top)
-				processed[top] = true
-				discovered[top] = false
+				continue
+			}
+
+			color[top] = "grey"
+
+			if len(g.edgeMap[top]) == 0 {
+				sorted = pushFront(sorted, top)
+				color[top] = "black"
 				dfsStack = dfsStack.pop()
 			} else {
 				for _, followers := range g.edgeMap[top] {
-					for _, v := range followers {
-						if _, ok := processed[string(v)]; !ok {
+					for _, n := range followers {
+						node := string(n)
 
-							if discovered[string(v)] {
-								return sortedChar, false
+						if color[node] == "grey" {
+							return sorted, false
+						} else if color[node] == "black" {
+							if color[top] != "black" {
+								sorted = pushFront(sorted, top)
+								color[top] = "black"
 							}
-
-							dfsStack.push(string(v))
-						} else {
-							sortedChar = pushFront(sortedChar, top)
-							processed[top] = true
-							discovered[top] = false
 							dfsStack = dfsStack.pop()
+						} else {
+							dfsStack.push(node)
 						}
 					}
 				}
@@ -114,14 +114,7 @@ func (g *Graph) topologicalSort() ([]string, bool) {
 
 	}
 
-	return sortedChar, true
-}
-
-func pushFront(sortedChar []string, node string) []string {
-	newSortedChar := make([]string, len(sortedChar)+1)
-	newSortedChar[0] = node
-	copy(newSortedChar[1:], sortedChar)
-	return newSortedChar
+	return sorted, true
 }
 
 type dfsStack []string
@@ -139,4 +132,11 @@ func (s *dfsStack) pop() dfsStack {
 func (s *dfsStack) peek() string {
 	sa := *s
 	return sa[len(sa)-1]
+}
+
+func pushFront(sorted []string, node string) []string {
+	newSorted := make([]string, len(sorted)+1)
+	newSorted[0] = node
+	copy(newSorted[1:], sorted)
+	return newSorted
 }
