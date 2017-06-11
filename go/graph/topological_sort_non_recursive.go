@@ -9,29 +9,27 @@ func main() {
 	g := Graph{}
 	g.edgeMap = make(map[string][]string)
 
-	fmt.Println("sorted", sorted1)
-	graph1 := buildGraph(g, sorted1)
-	fmt.Println(graph1)
+	fmt.Println("Given (sorted):", sorted1)
+	buildGraph(g, sorted1)
 	sorted, isDAG := g.topologicalSort()
-	fmt.Println("sorted", sorted)
-	fmt.Println("isDAG", isDAG)
+	fmt.Println("\tisDAG:", isDAG)
+	fmt.Println("\tPossible sort order:", sorted)
 
 	g2 := Graph{}
 	g2.edgeMap = make(map[string][]string)
 
-	fmt.Println("unsorted", unsorted1)
-	graph2 := buildGraph(g2, unsorted1)
-	fmt.Println(graph2)
+	fmt.Println("Given (unsorted)", unsorted1)
+	buildGraph(g2, unsorted1)
 	unsorted, isDAG := g2.topologicalSort()
-	fmt.Println("unsorted", unsorted)
-	fmt.Println("isDAG", isDAG)
+	fmt.Println("\tisDAG", isDAG)
+	fmt.Println("\tPossible sort order:", unsorted)
 }
 
 type Graph struct {
 	edgeMap map[string][]string
 }
 
-func buildGraph(g Graph, words []string) Graph {
+func buildGraph(g Graph, words []string) {
 	prev := words[0]
 
 	for i := 1; i < len(words); i++ {
@@ -40,8 +38,6 @@ func buildGraph(g Graph, words []string) Graph {
 		generateRelationship(g, string(prev), words[i])
 		prev = words[i]
 	}
-
-	return g
 }
 
 func generateRelationship(g Graph, prev, cur string) {
