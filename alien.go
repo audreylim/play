@@ -74,38 +74,39 @@ func (g *Graph) topologicalSort() ([]string, bool) {
 	processed := make(map[string]bool)
 	dfsStack := dfsStack{}
 
-	root := "x"
-	dfsStack.push(root)
+	for k, _ := range g.edgeMap {
+		dfsStack.push(k)
 
-	for len(dfsStack) != 0 {
-		top := dfsStack.peek()
-		discovered[top] = true
+		for len(dfsStack) != 0 {
+			top := dfsStack.peek()
+			discovered[top] = true
 
-		if _, ok := g.edgeMap[top]; !ok {
-			processed[top] = true
-			discovered[top] = false
-			sortedChar = append(sortedChar, top)
-			dfsStack = dfsStack.pop()
-		} else if len(g.edgeMap[top]) == 0 {
-			sortedChar = append(sortedChar, top)
-			processed[top] = true
-			discovered[top] = false
-			dfsStack = dfsStack.pop()
-		} else {
-			for _, followers := range g.edgeMap[top] {
-				for _, v := range followers {
-					if _, ok := processed[string(v)]; !ok {
+			if _, ok := g.edgeMap[top]; !ok {
+				processed[top] = true
+				discovered[top] = false
+				sortedChar = pushFront(sortedChar, top)
+				dfsStack = dfsStack.pop()
+			} else if len(g.edgeMap[top]) == 0 {
+				sortedChar = pushFront(sortedChar, top)
+				processed[top] = true
+				discovered[top] = false
+				dfsStack = dfsStack.pop()
+			} else {
+				for _, followers := range g.edgeMap[top] {
+					for _, v := range followers {
+						if _, ok := processed[string(v)]; !ok {
 
-						if discovered[string(v)] {
-							return sortedChar, false
+							if discovered[string(v)] {
+								return sortedChar, false
+							}
+
+							dfsStack.push(string(v))
+						} else {
+							sortedChar = pushFront(sortedChar, top)
+							processed[top] = true
+							discovered[top] = false
+							dfsStack = dfsStack.pop()
 						}
-
-						dfsStack.push(string(v))
-					} else {
-						sortedChar = append(sortedChar, top)
-						processed[top] = true
-						discovered[top] = false
-						dfsStack = dfsStack.pop()
 					}
 				}
 			}
@@ -114,6 +115,13 @@ func (g *Graph) topologicalSort() ([]string, bool) {
 	}
 
 	return sortedChar, true
+}
+
+func pushFront(sortedChar []string, node string) []string {
+	newSortedChar := make([]string, len(sortedChar)+1)
+	newSortedChar[0] = node
+	copy(newSortedChar[1:], sortedChar)
+	return newSortedChar
 }
 
 type dfsStack []string
