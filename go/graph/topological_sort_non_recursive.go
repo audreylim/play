@@ -27,12 +27,16 @@ func main() {
 	fmt.Println("isDAG", isDAG)
 }
 
+type Graph struct {
+	edgeMap map[string][]string
+}
+
 func buildGraph(g Graph, words []string) Graph {
 	prev := words[0]
 
 	for i := 1; i < len(words); i++ {
 		word := words[i]
-		g.addVertex(string(word[0]))
+		g.addNode(string(word[0]))
 		generateRelationship(g, string(prev), words[i])
 		prev = words[i]
 	}
@@ -43,21 +47,20 @@ func buildGraph(g Graph, words []string) Graph {
 func generateRelationship(g Graph, prev, cur string) {
 	for i := 0; i < len(prev) && i < len(cur); i++ {
 		if prev[i] != cur[i] {
-			g.addVertex(string(cur[i]))
-			g.addVertex(string(prev[i]))
-			g.addEdge(string(prev[i]), string(cur[i]))
+			from := string(prev[i])
+			to := string(cur[i])
+
+			g.addNode(from)
+			g.addNode(to)
+			g.addEdge(from, to)
 			break
 		}
 	}
 }
 
-type Graph struct {
-	edgeMap map[string][]string
-}
-
-func (g *Graph) addVertex(v string) {
-	if _, ok := g.edgeMap[v]; !ok {
-		g.edgeMap[v] = []string{}
+func (g *Graph) addNode(n string) {
+	if _, ok := g.edgeMap[n]; !ok {
+		g.edgeMap[n] = []string{}
 	}
 }
 
@@ -70,6 +73,7 @@ func (g *Graph) addEdge(from, to string) {
 // Non-recursive DFS
 func (g *Graph) topologicalSort() ([]string, bool) {
 	sorted := []string{}
+	isDAG := true
 
 	dfsStack := dfsStack{}
 	color := make(map[string]string)
@@ -80,6 +84,8 @@ func (g *Graph) topologicalSort() ([]string, bool) {
 		for len(dfsStack) != 0 {
 			top := dfsStack.peek()
 
+			// "black" if node has been processed
+			// "grey" if discovered
 			if color[top] == "black" {
 				dfsStack = dfsStack.pop()
 				continue
@@ -97,7 +103,8 @@ func (g *Graph) topologicalSort() ([]string, bool) {
 						node := string(n)
 
 						if color[node] == "grey" {
-							return sorted, false
+							isDAG = false
+							return sorted, isDAG
 						} else if color[node] == "black" {
 							if color[top] != "black" {
 								sorted = pushFront(sorted, top)
@@ -114,7 +121,7 @@ func (g *Graph) topologicalSort() ([]string, bool) {
 
 	}
 
-	return sorted, true
+	return sorted, isDAG
 }
 
 type dfsStack []string
@@ -124,14 +131,14 @@ func (s *dfsStack) push(c string) {
 }
 
 func (s *dfsStack) pop() dfsStack {
-	sa := *s
-	sa = sa[:len(sa)-1]
-	return sa
+	stack := *s
+	stack = stack[:len(stack)-1]
+	return stack
 }
 
 func (s *dfsStack) peek() string {
-	sa := *s
-	return sa[len(sa)-1]
+	stack := *s
+	return stack[len(stack)-1]
 }
 
 func pushFront(sorted []string, node string) []string {
