@@ -4,22 +4,31 @@ import "fmt"
 
 func main() {
 	sorted1 := []string{"xza", "ayh", "ples", "plares", "bhaaz", "bnc"}
-	//	unsorted1 := []string{"xza", "ayh", "eyes", "ples", "plares", "bhaaz", "bnc"}
-
-	fmt.Println(sorted1)
+	unsorted1 := []string{"xza", "ayh", "eyes", "ples", "plares", "bhaaz", "bnc"}
 
 	g := Graph{}
 	g.edgeMap = make(map[string][]string)
-	graph := buildGraph(g, sorted1)
-	fmt.Println(graph)
-	sorted := g.topologicalSort()
+
+	fmt.Println("sorted", sorted1)
+	graph1 := buildGraph(g, sorted1)
+	fmt.Println(graph1)
+	sorted, isDAG := g.topologicalSort()
 	fmt.Println("sorted", sorted)
+	fmt.Println("isDAG", isDAG)
+
+	g2 := Graph{}
+	g2.edgeMap = make(map[string][]string)
+
+	fmt.Println("unsorted", unsorted1)
+	graph2 := buildGraph(g2, unsorted1)
+	fmt.Println(graph2)
+	unsorted, isDAG := g2.topologicalSort()
+	fmt.Println("unsorted", unsorted)
+	fmt.Println("isDAG", isDAG)
 }
 
 func buildGraph(g Graph, words []string) Graph {
 	prev := words[0]
-	g.addVertex(string(prev[0]))
-	g.firstNode = string(words[0][0])
 
 	for i := 1; i < len(words); i++ {
 		word := words[i]
@@ -43,8 +52,7 @@ func generateRelationship(g Graph, prev, cur string) {
 }
 
 type Graph struct {
-	edgeMap   map[string][]string
-	firstNode string
+	edgeMap map[string][]string
 }
 
 func (g *Graph) addVertex(v string) {
@@ -59,35 +67,44 @@ func (g *Graph) addEdge(from, to string) {
 	g.edgeMap[from] = relations
 }
 
-func (g *Graph) topologicalSort() []string {
+func (g *Graph) topologicalSort() ([]string, bool) {
 	sortedChar := []string{}
 
-	//	discovered := make(map[string]bool)
+	discovered := make(map[string]bool)
 	processed := make(map[string]bool)
 	dfsStack := dfsStack{}
 
-	//root := g.firstNode
 	root := "x"
 	dfsStack.push(root)
 
 	for len(dfsStack) != 0 {
 		top := dfsStack.peek()
+		discovered[top] = true
 
 		if _, ok := g.edgeMap[top]; !ok {
 			processed[top] = true
+			discovered[top] = false
 			sortedChar = append(sortedChar, top)
+			dfsStack = dfsStack.pop()
 		} else if len(g.edgeMap[top]) == 0 {
 			sortedChar = append(sortedChar, top)
 			processed[top] = true
+			discovered[top] = false
 			dfsStack = dfsStack.pop()
 		} else {
 			for _, followers := range g.edgeMap[top] {
 				for _, v := range followers {
 					if _, ok := processed[string(v)]; !ok {
+
+						if discovered[string(v)] {
+							return sortedChar, false
+						}
+
 						dfsStack.push(string(v))
 					} else {
 						sortedChar = append(sortedChar, top)
 						processed[top] = true
+						discovered[top] = false
 						dfsStack = dfsStack.pop()
 					}
 				}
@@ -96,7 +113,7 @@ func (g *Graph) topologicalSort() []string {
 
 	}
 
-	return sortedChar
+	return sortedChar, true
 }
 
 type dfsStack []string
