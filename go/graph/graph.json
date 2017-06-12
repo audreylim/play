@@ -1,4 +1,7 @@
 {"samples": [
   {"word_list": ["xza", "ayh", "ples", "plares", "bhaaz", "bnc"], "is_sorted": true},
-  {"word_list": ["xza", "ayh", "eyes", "ples", "plares", "bhaaz", "bnc"], "is_sorted": false}
+  {"word_list": ["xza", "ayh", "aze", "yes", "yd", "bnc"], "is_sorted": true},
+  {"word_list": ["xza", "ayh", "eyes", "ples", "plares", "bhaaz", "bnc"], "is_sorted": false},
+  {"word_list": ["xza", "ayh", "eyes", "ples", "are"], "is_sorted": false},
+  {"word_list": ["xza", "ayh", "eyes", "bab", "plees", "pleb"], "is_sorted": false}
 ]}
