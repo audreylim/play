@@ -7,7 +7,7 @@ import (
 )
 
 type samples struct {
-	Sample []sample `json:"samples"`
+	Samples []sample `json:"samples"`
 }
 
 type sample struct {
@@ -26,16 +26,16 @@ func main() {
 		fmt.Println(err)
 	}
 
-	for _, v := range s.Sample {
+	for _, sample := range s.Samples {
 		g := Graph{}
 		g.edgeMap = make(map[string][]string)
 
-		fmt.Println("Given: ", v.WordList)
-		fmt.Println("Want:\tis sorted: ", v.IsSorted)
-		buildGraph(g, v.WordList)
+		fmt.Println("Given: ", sample.WordList)
+		fmt.Println("Want:\tis sorted: ", sample.IsSorted)
+		buildGraph(g, sample.WordList)
 		sorted, isDAG := g.topologicalSort()
 		fmt.Println("Got:\tis sorted:", isDAG)
-		if v.IsSorted {
+		if sample.IsSorted {
 			fmt.Println("\tPossible sort order: ", sorted)
 		}
 		fmt.Println("")
