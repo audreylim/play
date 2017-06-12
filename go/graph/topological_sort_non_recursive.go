@@ -1,28 +1,41 @@
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+)
+
+type samples struct {
+	Sample []sample `json:"samples"`
+}
+
+type sample struct {
+	WordList []string `json:"word_list"`
+	IsSorted bool     `json:"is_sorted"`
+}
 
 func main() {
-	sorted1 := []string{"xza", "ayh", "ples", "plares", "bhaaz", "bnc"}
-	unsorted1 := []string{"xza", "ayh", "eyes", "ples", "plares", "bhaaz", "bnc"}
+	f, err := ioutil.ReadFile("go/graph/graph.json")
+	if err != nil {
+		panic(err)
+	}
 
-	g := Graph{}
-	g.edgeMap = make(map[string][]string)
+	var s samples
+	if err := json.Unmarshal(f, &s); err != nil {
+		fmt.Println(err)
+	}
 
-	fmt.Println("Given (sorted):", sorted1)
-	buildGraph(g, sorted1)
-	sorted, isDAG := g.topologicalSort()
-	fmt.Println("\tisDAG:", isDAG)
-	fmt.Println("\tPossible sort order:", sorted)
+	for _, v := range s.Sample {
+		g := Graph{}
+		g.edgeMap = make(map[string][]string)
 
-	g2 := Graph{}
-	g2.edgeMap = make(map[string][]string)
-
-	fmt.Println("Given (unsorted)", unsorted1)
-	buildGraph(g2, unsorted1)
-	unsorted, isDAG := g2.topologicalSort()
-	fmt.Println("\tisDAG", isDAG)
-	fmt.Println("\tPossible sort order:", unsorted)
+		fmt.Printf("Given (is sorted: %t): %v\n", v.IsSorted, v.WordList)
+		buildGraph(g, v.WordList)
+		sorted, isDAG := g.topologicalSort()
+		fmt.Println("Got:\n\tisDAG:", isDAG)
+		fmt.Println("\tPossible sort order:", sorted)
+	}
 }
 
 type Graph struct {

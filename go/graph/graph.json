@@ -1,0 +1,4 @@
+{"samples": [
+  {"word_list": ["xza", "ayh", "ples", "plares", "bhaaz", "bnc"], "is_sorted": true},
+  {"word_list": ["xza", "ayh", "eyes", "ples", "plares", "bhaaz", "bnc"], "is_sorted": false}
+]}
