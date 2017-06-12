@@ -35,7 +35,10 @@ func main() {
 		buildGraph(g, v.WordList)
 		sorted, isDAG := g.topologicalSort()
 		fmt.Println("Got:\tis sorted:", isDAG)
-		fmt.Printf("\tPossible sort order: %v\n\n", sorted)
+		if v.IsSorted {
+			fmt.Println("\tPossible sort order: ", sorted)
+		}
+		fmt.Println("")
 	}
 }
 
@@ -102,28 +105,29 @@ func (g *Graph) topologicalSort() ([]string, bool) {
 			}
 
 			color[top] = "grey"
+			followers := g.edgeMap[top]
 
-			if len(g.edgeMap[top]) == 0 {
+			if len(followers) == 0 {
 				sorted = pushFront(sorted, top)
 				color[top] = "black"
 				dfsStack = dfsStack.pop()
 			} else {
-				for _, followers := range g.edgeMap[top] {
-					for _, n := range followers {
-						node := string(n)
+				for _, node := range followers {
 
-						if color[node] == "grey" {
-							isDAG = false
-							return sorted, isDAG
-						} else if color[node] == "black" {
-							if color[top] != "black" {
-								sorted = pushFront(sorted, top)
-								color[top] = "black"
-							}
-							dfsStack = dfsStack.pop()
-						} else {
-							dfsStack.push(node)
+					if color[node] == "grey" {
+						isDAG = false
+						return sorted, isDAG
+					} else if color[node] == "black" {
+						if color[top] != "black" {
+							sorted = pushFront(sorted, top)
+							color[top] = "black"
 						}
+						//		fmt.Println("edgemap", g.edgeMap)
+						//		fmt.Println("dfs", dfsStack)
+						//		fmt.Println("top", top)
+						dfsStack = dfsStack.pop()
+					} else {
+						dfsStack.push(node)
 					}
 				}
 			}
