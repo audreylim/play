@@ -99,7 +99,13 @@ func (g *Graph) topologicalSort() ([]string, bool) {
 
 			// "black" if node has been processed
 			// "grey" if discovered
+			// "" if undiscovered
 			if color[top] == "black" {
+				dfsStack = dfsStack.pop()
+				continue
+			} else if color[top] == "grey" {
+				sorted = pushFront(sorted, top)
+				color[top] = "black"
 				dfsStack = dfsStack.pop()
 				continue
 			}
@@ -113,23 +119,14 @@ func (g *Graph) topologicalSort() ([]string, bool) {
 				dfsStack = dfsStack.pop()
 			} else {
 				for _, node := range followers {
-
 					if color[node] == "grey" {
 						isDAG = false
 						return sorted, isDAG
-					} else if color[node] == "black" {
-						if color[top] != "black" {
-							sorted = pushFront(sorted, top)
-							color[top] = "black"
-						}
-						//		fmt.Println("edgemap", g.edgeMap)
-						//		fmt.Println("dfs", dfsStack)
-						//		fmt.Println("top", top)
-						dfsStack = dfsStack.pop()
-					} else {
+					} else if color[node] == "" {
 						dfsStack.push(node)
 					}
 				}
+
 			}
 		}
 
