@@ -30,11 +30,12 @@ func main() {
 		g := Graph{}
 		g.edgeMap = make(map[string][]string)
 
-		fmt.Printf("Given (is sorted: %t): %v\n", v.IsSorted, v.WordList)
+		fmt.Println("Given: ", v.WordList)
+		fmt.Println("Want:\tis sorted: ", v.IsSorted)
 		buildGraph(g, v.WordList)
 		sorted, isDAG := g.topologicalSort()
-		fmt.Println("Got:\n\tisDAG:", isDAG)
-		fmt.Println("\tPossible sort order:", sorted)
+		fmt.Println("Got:\tis sorted:", isDAG)
+		fmt.Printf("\tPossible sort order: %v\n\n", sorted)
 	}
 }
 
