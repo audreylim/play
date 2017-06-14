@@ -23,7 +23,7 @@ func main() {
 
 	var s samples
 	if err := json.Unmarshal(f, &s); err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 
 	for _, sample := range s.Samples {
