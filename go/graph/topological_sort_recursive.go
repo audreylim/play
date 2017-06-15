@@ -88,51 +88,46 @@ func (g *Graph) topologicalSort() ([]string, bool) {
 	sorted := []string{}
 	isDAG := true
 
-	dfsStack := dfsStack{}
 	color := make(map[string]string)
 
 	for k, _ := range g.edgeMap {
-		dfsStack.push(k)
-
-		for len(dfsStack) != 0 {
-			top := dfsStack.peek()
-
-			// "black" if node has been processed
-			// "grey" if discovered
-			// "" if undiscovered
-			if color[top] == "black" {
-				dfsStack = dfsStack.pop()
-				continue
-			} else if color[top] == "grey" {
-				sorted = pushFront(sorted, top)
-				color[top] = "black"
-				dfsStack = dfsStack.pop()
-				continue
-			}
-
-			color[top] = "grey"
-			followers := g.edgeMap[top]
-
-			if len(followers) == 0 {
-				sorted = pushFront(sorted, top)
-				color[top] = "black"
-				dfsStack = dfsStack.pop()
-			} else {
-				for _, node := range followers {
-					if color[node] == "grey" {
-						isDAG = false
-						return sorted, isDAG
-					} else if color[node] == "" {
-						dfsStack.push(node)
-					}
-				}
-
+		if color[k] == "" {
+			color, isDAG = sort(k, color, &sorted, g)
+			if !isDAG {
+				break
 			}
 		}
 
 	}
-
 	return sorted, isDAG
+}
+
+func sort(node string, color map[string]string, sorted *[]string, g *Graph) (map[string]string, bool) {
+	if color[node] == "grey" {
+		return color, false
+	}
+	if color[node] == "black" {
+		return color, true
+	}
+
+	followers := g.edgeMap[node]
+	if len(followers) == 0 {
+		pushFront(sorted, node)
+		color[node] = "black"
+		return color, true
+	}
+
+	for _, n := range followers {
+		color[node] = "grey"
+		color, isDAG := sort(n, color, sorted, g)
+		if !isDAG {
+			return color, false
+		}
+	}
+	color[node] = "black"
+	pushFront(sorted, node)
+
+	return color, true
 }
 
 type dfsStack []string
@@ -152,9 +147,9 @@ func (s *dfsStack) peek() string {
 	return stack[len(stack)-1]
 }
 
-func pushFront(sorted []string, node string) []string {
-	newSorted := make([]string, len(sorted)+1)
+func pushFront(sorted *[]string, node string) {
+	newSorted := make([]string, len(*sorted)+1)
 	newSorted[0] = node
-	copy(newSorted[1:], sorted)
-	return newSorted
+	copy(newSorted[1:], *sorted)
+	*sorted = newSorted
 }
