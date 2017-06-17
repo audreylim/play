@@ -130,23 +130,6 @@ func sort(node string, color map[string]string, sorted *[]string, g *Graph) (map
 	return color, true
 }
 
-type dfsStack []string
-
-func (s *dfsStack) push(c string) {
-	*s = append(*s, c)
-}
-
-func (s *dfsStack) pop() dfsStack {
-	stack := *s
-	stack = stack[:len(stack)-1]
-	return stack
-}
-
-func (s *dfsStack) peek() string {
-	stack := *s
-	return stack[len(stack)-1]
-}
-
 func pushFront(sorted *[]string, node string) {
 	newSorted := make([]string, len(*sorted)+1)
 	newSorted[0] = node
