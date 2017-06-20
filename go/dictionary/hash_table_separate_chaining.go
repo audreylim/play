@@ -21,6 +21,7 @@ func main() {
 	hashTable = add(hashTable, "a key", "a valueasdf")
 
 	fmt.Println(hashTable)
+	fmt.Println(get(hashTable, "qwer"))
 }
 
 func createHash(key string) int {
@@ -38,10 +39,17 @@ func get(hashTable [10]Bucket, key string) string {
 	hash := createHash(key)
 	bucket := hashTable[hash]
 	for {
+		if bucket == (Bucket{}) {
+			break
+		}
 		if bucket.Key == key {
 			return bucket.Value
 		}
-		bucket = *bucket.Next
+		if *bucket.Next != (Bucket{}) {
+			bucket = *bucket.Next
+		} else {
+			break
+		}
 	}
 	return ""
 }
