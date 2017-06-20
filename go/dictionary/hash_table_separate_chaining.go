@@ -66,11 +66,13 @@ func add(hashTable [10]Bucket, key, value string) [10]Bucket {
 		hashTable[hash] = newBucket
 	} else {
 		for {
+			// Override value of existing key
 			if bucket.Key == key {
 				bucket.Value = value
 				hashTable[hash] = bucket
 				break
 			}
+			// Append to tail of linked list
 			if bucket.Next == nil {
 				bucket.Next = &newBucket
 				hashTable[hash] = bucket
