@@ -54,31 +54,24 @@ func add(hashTable [10]Bucket, key, value string) [10]Bucket {
 	newBucket.Key = key
 	newBucket.Value = value
 
-	var b *Bucket
-	b = &bucket
-
 	if bucket == (Bucket{}) {
 		hashTable[hash] = newBucket
 	} else {
 		for {
-			if b.Key == key {
-				b.setBucket(key, value)
+			if bucket.Key == key {
+				bucket.Value = value
 				hashTable[hash] = bucket
 				break
 			}
-			if b.Next == nil {
-				b.Next = &newBucket
+			if bucket.Next == nil {
+				bucket.Next = &newBucket
 				hashTable[hash] = bucket
 				break
 			}
-			b = b.Next
+			bucket = *bucket.Next
 		}
 	}
 	return hashTable
-}
-
-func (b *Bucket) setBucket(key, value string) {
-	b.Value = value
 }
 
 func remove(v string) {
