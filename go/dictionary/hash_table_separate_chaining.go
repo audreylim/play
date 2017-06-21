@@ -22,6 +22,8 @@ func main() {
 
 	fmt.Println(hashTable)
 	fmt.Println(get(hashTable, "qwer"))
+	hashTable = remove(hashTable, "a key")
+	fmt.Println("remove", hashTable)
 }
 
 func createHash(key string) int {
@@ -84,5 +86,37 @@ func add(hashTable [10]Bucket, key, value string) [10]Bucket {
 	return hashTable
 }
 
-func remove(v string) {
+func remove(hashTable [10]Bucket, key string) [10]Bucket {
+	hash := createHash(key)
+	bucket := hashTable[hash]
+	head := &bucket
+
+	var prevBucket, curBucket *Bucket
+
+	if bucket == (Bucket{}) {
+		return hashTable
+	} else {
+		curBucket = &bucket
+		for {
+			if curBucket.Key == key {
+				if curBucket == head {
+					if curBucket.Next != nil {
+						hashTable[hash] = *curBucket.Next
+						break
+					} else {
+						hashTable[hash] = Bucket{}
+						break
+					}
+				} else {
+					prevBucket.Next = curBucket.Next
+					hashTable[hash] = *head
+					break
+				}
+			}
+			prevBucket = &bucket
+			curBucket = curBucket.Next
+		}
+	}
+
+	return hashTable
 }
